@@ -30,9 +30,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -44,12 +47,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private Boolean mLocationPermissionsGranted = false;
     private PlaceInfo mPlace;
-    private LatLng newMarkerLocation;
-    public static boolean markerCreation = false;
-
-    public static final String TAG = "SNAPMAPS";
+    public ArrayList<Marker> userAddedMarkers = new ArrayList<>();
+    public ArrayList<String> markerTitle = new ArrayList<>();
+    public ArrayList<String> markerDescription = new ArrayList<>();
+    public ArrayList<LatLng> markerCoords = new ArrayList<>();
+    public static int addedThisSession;
+    public static final String TAG = "MAPPING";
     LatLng location2 = new LatLng(-34, 151);
-
+    LatLng mystery = new LatLng(40, -74);
+    public ArrayList<LatLng> newMarkerLocation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,17 +79,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         Button Map = (Button) findViewById(R.id.markerMaker);
+
         Map.setOnClickListener(new View.OnClickListener() {
                                    @Override
                                    public void onClick(View v) {
+                                       trackCamera();
+                                       addedThisSession++;
                                        Log.d(TAG, "ButtonPressed");
-                                       Intent intent = new Intent(MapsActivity.this,newMarker.class);
+                                       Intent intent = new Intent(MapsActivity.this, newMarker.class);
                                        startActivity(intent);
-                                       LatLng location = new LatLng(20, 20);
-                                       newMarkerLocation = location;
+
 
                                    }
                                });
+    }
+    private void trackCamera(){
+        Log.d(TAG, "Getting Cam Coords");
+        newMarkerLocation.add(mMap.getCameraPosition().target);
     }
 
 
@@ -99,8 +111,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        Log.d(TAG, "Markers to be added: "+userAddedMarkers);
 
         //Toast.makeText(this, "Map is Ready", Toast.LENGTH_SHORT).show();
+        for(int i=0; i<addedThisSession; i++) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(newMarkerLocation.get(i))
+                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
+                    // Specifies the anchor to be at a particular point in the marker image.
+                    .anchor(0.5f, 1)
+                    .title(newMarker.MarkerTitle.get(i))
+                    .snippet(newMarker.MarkerDescription.get(i))
+                    .draggable(true));
+            Log.d(TAG, "MarkerCreation For LOOP");
+
+        }
 
             mMap.addMarker(new MarkerOptions()
                     .position(location2)
@@ -109,25 +134,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .anchor(0.5f, 1)
                     .title("My Sponge is Ready")
                     .snippet("Google Hire Me Already"));
-            if(markerCreation == true) {
-                Toast.makeText(this, "Making new Marker", Toast.LENGTH_SHORT).show();
-                mMap.addMarker(new MarkerOptions()
-                        .position(newMarkerLocation)
-                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                        // Specifies the anchor to be at a particular point in the marker image.
-                        .anchor(0.5f, 1)
-                        .title("My Sponge is Ready")
-                        .snippet("Google Hire Me Already"));
-                markerCreation = false;
-            }
+
 
 
             // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(34, 51);
         LatLng sydney2 = new LatLng(-34, 150);
-
+        Log.d(TAG, "initMap: PLACING MARKERS");
         mMap.addMarker(new MarkerOptions()
-                .position(location2)
+                .position(sydney)
                 .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
                 // Specifies the anchor to be at a particular point in the marker image.
                 .anchor(0.5f, 1)

@@ -20,7 +20,7 @@
         tools:layout_editor_absoluteY="3dp" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/editTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -31,24 +31,24 @@
         tools:layout_editor_absoluteX="16dp" />
 
     <EditText
-        android:id="@+id/editText5"
+        android:id="@+id/editDescript"
         android:layout_width="349dp"
         android:layout_height="137dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="textMultiLine"
         android:text="Description"
-        app:layout_constraintTop_toBottomOf="@+id/editText3"
+        app:layout_constraintTop_toBottomOf="@+id/editTitle"
         tools:layout_editor_absoluteX="16dp" />
 
     <EditText
-        android:id="@+id/editText6"
+        android:id="@+id/editTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="time"
         android:text="Time"
-        app:layout_constraintTop_toBottomOf="@+id/editText5"
+        app:layout_constraintTop_toBottomOf="@+id/editDescript"
         tools:layout_editor_absoluteX="16dp" />
 
     <Button

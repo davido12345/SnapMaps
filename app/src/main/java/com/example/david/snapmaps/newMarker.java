@@ -15,10 +15,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
+
+import java.util.ArrayList;
 
 public class newMarker extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    public static final String TAG = "Nav";
+    public static final String TAG = "CREATING";
+    public static ArrayList<String> MarkerTitle = new ArrayList<>();
+    public static ArrayList<String> MarkerDescription = new ArrayList<>();
 
 
     @Override
@@ -42,7 +47,6 @@ public class newMarker extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         init();
@@ -113,12 +117,26 @@ public class newMarker extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "ButtonPressed");
-                MapsActivity.markerCreation = true;
+                createNewMarker();
                 Intent intent = new Intent(newMarker.this, MapsActivity.class);
                 startActivity(intent);
 
 
             }
         });
+    }
+    private void createNewMarker(){
+        EditText txtTitle =
+                (EditText) findViewById(R.id.editTitle);
+        String markerTitle = txtTitle.getText().toString();
+        MarkerTitle.add(markerTitle);
+
+        EditText txtDescription =
+                (EditText) findViewById(R.id.editDescript);
+        String markerDescription = txtDescription.getText().toString();
+        MarkerDescription.add(markerDescription);
+        Log.d(TAG, "initMap: MarkerData Created");
+
+
     }
 }
