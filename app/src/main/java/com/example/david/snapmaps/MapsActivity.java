@@ -51,7 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Boolean mLocationPermissionsGranted = false;
     private PlaceInfo mPlace;
     public ArrayList<Marker> AllMarkers = new ArrayList<>();
-    public ArrayList<MarkerOptions> AllMarkersOptions = new ArrayList<>();
+    ArrayList<MarkerOptions> AllMarkersOptions = new ArrayList<>();
     public ArrayList<Marker> userAddedMarkers = new ArrayList<>();
     public ArrayList<String> markerTitle = new ArrayList<>();
     public ArrayList<String> markerDescription = new ArrayList<>();
@@ -108,9 +108,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 trackCamera();
                 Log.d(TAG, "ButtonPressed");
-                if(isMarkerSelected == true){
-                    AllMarkers.remove(removalIndex);
-                    createMarkers();
+
+                if(isMarkerSelected){
+                    AllMarkersOptions.remove(removalIndex);
+                    mMap.clear();
+
                 }
             }
 
@@ -120,11 +122,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void trackCamera() {
         Log.d(TAG, "Getting Cam Coords");
         newMarkerLocation.add(mMap.getCameraPosition().target);
-    }
+    }//Inactive
 
     private void createMarkers(){
         for (int i = 0; i<AllMarkers.size(); i++){
-            Marker marker = mMap.addMarker(AllMarkersOptions.get(i));
+            mMap.addMarker(AllMarkersOptions.get(i));
         }
     }
 
@@ -139,6 +141,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .title(newMarker.MarkerTitle.get(i))
                     .snippet(newMarker.MarkerDescription.get(i) + " Time: " + newMarker.MarkerTime)
                     .draggable(false));
+            marker
             Log.d(TAG, "MarkerCreation For LOOP");
             AllMarkers.add(marker);
             AllMarkersOptions.add(new MarkerOptions()
@@ -153,6 +156,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void loadOtherMarker(){
+        AllMarkersOptions.add(new MarkerOptions()
+                .position(sydney)
+                .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
+                // Specifies the anchor to be at a particular point in the marker image.
+                .anchor(0.5f, 1)
+                .title("My Sponge is Ready")
+                .snippet("Meme"));
+        AllMarkersOptions.add(new MarkerOptions()
+                .position(location2)
+                .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
+                // Specifies the anchor to be at a particular point in the marker image.
+                .anchor(0.5f, 1)
+                .title("My Sponge is Ready")
+                .snippet("Google Hire Me Already"));
         mMap.addMarker(new MarkerOptions()
                 .position(sydney)
                 .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
@@ -160,7 +177,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .anchor(0.5f, 1)
                 .title("My Sponge is Ready")
                 .snippet("Meme"));
-
         for (int i = 0; i < addedThisSession; i++) {
 
             mMap.addMarker(new MarkerOptions()
@@ -174,14 +190,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d(TAG, "MarkerCreation For LOOP");
 
         }
-
-        mMap.addMarker(new MarkerOptions()
-                .position(location2)
-                .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                // Specifies the anchor to be at a particular point in the marker image.
-                .anchor(0.5f, 1)
-                .title("My Sponge is Ready")
-                .snippet("Google Hire Me Already"));
 
 
 
@@ -202,11 +210,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "Markers to be added: " + userAddedMarkers);
         loadOtherMarker();
         loadExistingMarkers();
+        createMarkers();
         Log.d(TAG, "initMap: PLACING MARKERS");
         mMap.setOnMarkerClickListener(this);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-    }
+    }//ACTIVE MAIN
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
@@ -215,7 +224,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
+    }//Inactive
 
     private void getLocationPermission() {
         Log.d(TAG, "getLocationPermission: getting location permission");
@@ -232,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
         }
-    }
+    }//Inactive
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult: called.");
@@ -254,19 +263,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
-    }
+    }//Inactive
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        marker.showInfoWindow();
         for(int i =0; i<AllMarkers.size(); i++) {
             if (marker.equals(AllMarkers.get(i))){
-                marker.showInfoWindow();
                 removalIndex = i;
                 isMarkerSelected = true;
             }
         }
         return true;
-    }
+    }//ACTIVE
 
 }
 
