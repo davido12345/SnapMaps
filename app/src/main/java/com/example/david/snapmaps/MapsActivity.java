@@ -141,7 +141,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .title(newMarker.MarkerTitle.get(i))
                     .snippet(newMarker.MarkerDescription.get(i) + " Time: " + newMarker.MarkerTime)
                     .draggable(false));
-            marker
+
             Log.d(TAG, "MarkerCreation For LOOP");
             AllMarkers.add(marker);
             AllMarkersOptions.add(new MarkerOptions()
