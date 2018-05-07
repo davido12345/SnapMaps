@@ -26,6 +26,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 //import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -37,25 +38,34 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMarkerClickListener {
 
     private GoogleApiClient mGoogleApiClient;
     private Marker mMarker;
+    private int removalIndex;
     private GoogleMap mMap;
+    private boolean isMarkerSelected;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private Boolean mLocationPermissionsGranted = false;
     private PlaceInfo mPlace;
+    public ArrayList<Marker> AllMarkers = new ArrayList<>();
+    public ArrayList<MarkerOptions> AllMarkersOptions = new ArrayList<>();
     public ArrayList<Marker> userAddedMarkers = new ArrayList<>();
     public ArrayList<String> markerTitle = new ArrayList<>();
     public ArrayList<String> markerDescription = new ArrayList<>();
     public ArrayList<LatLng> markerCoords = new ArrayList<>();
+    public ArrayList<LatLng> Time = new ArrayList<>();
     public static int addedThisSession;
     public static final String TAG = "MAPPING";
     LatLng location2 = new LatLng(-34, 151);
     LatLng mystery = new LatLng(40, -74);
-    public ArrayList<LatLng> newMarkerLocation;
+    LatLng sydney = new LatLng(34, 51);
+    LatLng sydney2 = new LatLng(-34, 150);
+    public static ArrayList<LatLng> newMarkerLocation = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,68 +89,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         Button Map = (Button) findViewById(R.id.markerMaker);
-
         Map.setOnClickListener(new View.OnClickListener() {
-                                   @Override
-                                   public void onClick(View v) {
-                                       trackCamera();
-                                       addedThisSession++;
-                                       Log.d(TAG, "ButtonPressed");
-                                       Intent intent = new Intent(MapsActivity.this, newMarker.class);
-                                       startActivity(intent);
+            @Override
+            public void onClick(View v) {
+                trackCamera();
+                addedThisSession++;
+                Log.d(TAG, "ButtonPressed");
+                Intent intent = new Intent(MapsActivity.this, newMarker.class);
+                startActivity(intent);
 
 
-                                   }
-                               });
+            }
+        });
+
+        Button Delete = (Button) findViewById(R.id.delButton);
+        Delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                trackCamera();
+                Log.d(TAG, "ButtonPressed");
+                if(isMarkerSelected == true){
+                    AllMarkers.remove(removalIndex);
+                    createMarkers();
+                }
+            }
+
+        });
     }
-    private void trackCamera(){
+
+    private void trackCamera() {
         Log.d(TAG, "Getting Cam Coords");
         newMarkerLocation.add(mMap.getCameraPosition().target);
     }
 
+    private void createMarkers(){
+        for (int i = 0; i<AllMarkers.size(); i++){
+            Marker marker = mMap.addMarker(AllMarkersOptions.get(i));
+        }
+    }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        Log.d(TAG, "Markers to be added: "+userAddedMarkers);
-
-        //Toast.makeText(this, "Map is Ready", Toast.LENGTH_SHORT).show();
-        for(int i=0; i<addedThisSession; i++) {
-            mMap.addMarker(new MarkerOptions()
+    private void loadExistingMarkers() {
+        //Fill Arraylist here from database for title, descrip, time, location;
+        for (int i = 0; i<markerTitle.size(); i++){
+            Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(newMarkerLocation.get(i))
                     .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
                     // Specifies the anchor to be at a particular point in the marker image.
                     .anchor(0.5f, 1)
                     .title(newMarker.MarkerTitle.get(i))
-                    .snippet(newMarker.MarkerDescription.get(i))
-                    .draggable(true));
+                    .snippet(newMarker.MarkerDescription.get(i) + " Time: " + newMarker.MarkerTime)
+                    .draggable(false));
             Log.d(TAG, "MarkerCreation For LOOP");
-
-        }
-
-            mMap.addMarker(new MarkerOptions()
-                    .position(location2)
+            AllMarkers.add(marker);
+            AllMarkersOptions.add(new MarkerOptions()
+                    .position(newMarkerLocation.get(i))
                     .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
                     // Specifies the anchor to be at a particular point in the marker image.
                     .anchor(0.5f, 1)
-                    .title("My Sponge is Ready")
-                    .snippet("Google Hire Me Already"));
+                    .title(newMarker.MarkerTitle.get(i))
+                    .snippet(newMarker.MarkerDescription.get(i) + " Time: " + newMarker.MarkerTime)
+                    .draggable(false));
+        }
+    }
 
-
-
-            // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(34, 51);
-        LatLng sydney2 = new LatLng(-34, 150);
-        Log.d(TAG, "initMap: PLACING MARKERS");
+    private void loadOtherMarker(){
         mMap.addMarker(new MarkerOptions()
                 .position(sydney)
                 .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
@@ -148,15 +160,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .anchor(0.5f, 1)
                 .title("My Sponge is Ready")
                 .snippet("Meme"));
-        /*Bitmap icon = BitmapFactory.decodeResource(getResources(),
+
+        for (int i = 0; i < addedThisSession; i++) {
+
+            mMap.addMarker(new MarkerOptions()
+                    .position(newMarkerLocation.get(i))
+                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
+                    // Specifies the anchor to be at a particular point in the marker image.
+                    .anchor(0.5f, 1)
+                    .title(newMarker.MarkerTitle.get(i))
+                    .snippet(newMarker.MarkerDescription.get(i) + " Time: " + newMarker.MarkerTime)
+                    .draggable(true));
+            Log.d(TAG, "MarkerCreation For LOOP");
+
+        }
+
+        mMap.addMarker(new MarkerOptions()
+                .position(location2)
+                .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
+                // Specifies the anchor to be at a particular point in the marker image.
+                .anchor(0.5f, 1)
+                .title("My Sponge is Ready")
+                .snippet("Google Hire Me Already"));
 
 
-                R.drawable.s);*/
 
+    }
+    /*
+    private void markerMonitor(){
+        for(int i = 0; i<markerTitle.length; i++){
+        public boolean onMarkerClick(Marker marker)
+            {
+            return false;
+            }
+        }
+    }
+*/
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        Log.d(TAG, "Markers to be added: " + userAddedMarkers);
+        loadOtherMarker();
+        loadExistingMarkers();
+        Log.d(TAG, "initMap: PLACING MARKERS");
+        mMap.setOnMarkerClickListener(this);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        //  currentLocationMarker = mMap.addMarker(new MarkerOptions().position(currentLocation)
-        //         .icon(BitmapDescriptorFactory.fromBitmap(bmp));
-
 
     }
 
@@ -168,6 +216,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
+
+    private void getLocationPermission() {
+        Log.d(TAG, "getLocationPermission: getting location permission");
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                mLocationPermissionsGranted = true;
+                initMap();
+            } else {
+                ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
+
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult: called.");
+        mLocationPermissionsGranted = false;
+
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                            mLocationPermissionsGranted = false;
+                            Log.d(TAG, "onRequestPermissionsResult: permissions failed");
+                            return;
+                        }
+                    }
+                    Log.d(TAG, "onRequestPermissionsResult: permissions granted");
+                    mLocationPermissionsGranted = true;
+                    initMap();
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        for(int i =0; i<AllMarkers.size(); i++) {
+            if (marker.equals(AllMarkers.get(i))){
+                marker.showInfoWindow();
+                removalIndex = i;
+                isMarkerSelected = true;
+            }
+        }
+        return true;
+    }
+
+}
 
 /*
     private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo) {
@@ -196,94 +297,3 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //hideSoftKeyboard();
     }
     */
-
-
-
-
-    private void getLocationPermission() {
-        Log.d(TAG, "getLocationPermission: getting location permission");
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mLocationPermissionsGranted = true;
-                initMap();
-            } else {
-                ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
-
-            }
-        } else {
-            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
-        }
-    }
-
-
-
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult: called.");
-        mLocationPermissionsGranted = false;
-
-        switch (requestCode) {
-            case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0) {
-                    for (int i = 0; i < grantResults.length; i++) {
-                        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                            mLocationPermissionsGranted = false;
-                            Log.d(TAG, "onRequestPermissionsResult: permissions failed");
-                            return;
-                        }
-                    }
-                    Log.d(TAG, "onRequestPermissionsResult: permissions granted");
-                    mLocationPermissionsGranted = true;
-                    initMap();
-                }
-            }
-        }
-    }
-}
-/*
-    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
-        @Override
-        public void onResult(@NonNull PlaceBuffer places) {
-            if (!places.getStatus().isSuccess()) {
-                Log.d(TAG, "onResult: Place query did not complete successfully: " + places.getStatus().toString());
-                places.release();
-                return;
-            }
-            final Place place = places.get(0);
-
-            try {
-                mPlace = new PlaceInfo();
-                mPlace.setName(place.getName().toString());
-                Log.d(TAG, "onResult: name: " + place.getName());
-                mPlace.setAddress(place.getAddress().toString());
-                Log.d(TAG, "onResult: address: " + place.getAddress());
-//                mPlace.setAttributions(place.getAttributions().toString());
-//                Log.d(TAG, "onResult: attributions: " + place.getAttributions());
-                mPlace.setId(place.getId());
-                Log.d(TAG, "onResult: id:" + place.getId());
-                mPlace.setLatlng(place.getLatLng());
-                Log.d(TAG, "onResult: latlng: " + place.getLatLng());
-                mPlace.setRating(place.getRating());
-                Log.d(TAG, "onResult: rating: " + place.getRating());
-                mPlace.setPhoneNumber(place.getPhoneNumber().toString());
-                Log.d(TAG, "onResult: phone number: " + place.getPhoneNumber());
-                mPlace.setWebsiteUri(place.getWebsiteUri());
-                Log.d(TAG, "onResult: website uri: " + place.getWebsiteUri());
-
-                Log.d(TAG, "onResult: place: " + mPlace.toString());
-            } catch (NullPointerException e) {
-                Log.e(TAG, "onResult: NullPointerException: " + e.getMessage());
-            }
-
-            moveCamera(new LatLng(place.getViewport().getCenter().latitude,
-                    place.getViewport().getCenter().longitude), DEFAULT_ZOOM, mPlace.getName());
-
-            places.release();
-        }
-    };
-}
-*/
-
-
-

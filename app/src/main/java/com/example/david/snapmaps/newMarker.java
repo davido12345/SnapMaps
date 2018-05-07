@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 
 public class newMarker extends AppCompatActivity
@@ -24,6 +26,7 @@ public class newMarker extends AppCompatActivity
     public static final String TAG = "CREATING";
     public static ArrayList<String> MarkerTitle = new ArrayList<>();
     public static ArrayList<String> MarkerDescription = new ArrayList<>();
+    public static ArrayList<LatLng> MarkerTime = new ArrayList<>();
 
 
     @Override
@@ -137,6 +140,11 @@ public class newMarker extends AppCompatActivity
         MarkerDescription.add(markerDescription);
         Log.d(TAG, "initMap: MarkerData Created");
 
+        EditText txtTime =
+                (EditText) findViewById(R.id.editTime);
+        String markerTime = txtTime.getText().toString();
+        MarkerDescription.add(markerDescription);
+        Log.d(TAG, "initMap: MarkerData Created");
 
     }
 }
