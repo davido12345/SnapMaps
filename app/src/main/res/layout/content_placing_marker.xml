@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".newMarker"
-    tools:showIn="@layout/app_bar_main4">
+    tools:context=".PlacingMarker"
+    android:background="@drawable/backgroundmarker2"
+    tools:showIn="@layout/activity_placing_marker">
 
     <TextView
         android:id="@+id/textView4"
@@ -14,10 +15,11 @@
         android:layout_height="54dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:text="Create a new Meet Up!"
+        android:text="Create Your Marker"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="3dp" />
+        tools:layout_editor_absoluteY="3dp"
+        tools:ignore="MissingConstraints" />
 
     <EditText
         android:id="@+id/editTitle"
@@ -68,6 +70,8 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:text="Confirm"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="right|center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -57,8 +57,8 @@
             android:label="@string/title_activity_main3"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".newMarker"
-            android:label="@string/title_activity_main4"
+            android:name=".PlacingMarker"
+            android:label="@string/title_activity_placing_marker"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMarkerClickListener {
 
@@ -64,6 +65,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng sydney = new LatLng(34, 51);
     LatLng sydney2 = new LatLng(-34, 150);
     public static ArrayList<LatLng> newMarkerLocation = new ArrayList<>();
+    private Marker tobeDeleted;
+    private static CameraPosition lastCamSite;
+    public static boolean creationStarted=false;
 
 
     @Override
@@ -95,7 +99,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 trackCamera();
                 addedThisSession++;
                 Log.d(TAG, "ButtonPressed");
-                Intent intent = new Intent(MapsActivity.this, newMarker.class);
+                Intent intent = new Intent(MapsActivity.this, PlacingMarker.class);
                 startActivity(intent);
 
 
@@ -106,13 +110,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                trackCamera();
+                //trackCamera();
                 Log.d(TAG, "ButtonPressed");
-
-                if(isMarkerSelected){
-                    AllMarkersOptions.remove(removalIndex);
-                    mMap.clear();
-
+                tobeDeleted.remove();
+                for(int i = 0; i<AllMarkers.size(); i++){
+                    if(AllMarkers.get(i) == tobeDeleted){
+                        AllMarkers.remove(i);
+                    }
                 }
             }
 
@@ -122,36 +126,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void trackCamera() {
         Log.d(TAG, "Getting Cam Coords");
         newMarkerLocation.add(mMap.getCameraPosition().target);
+        lastCamSite= mMap.getCameraPosition();
     }//Inactive
+
 
     private void createMarkers(){
         for (int i = 0; i<AllMarkers.size(); i++){
+            //HashMap<Marker> hashMapMarker = new HashMap<>();
             mMap.addMarker(AllMarkersOptions.get(i));
+
+
+            //hashMapMarker.put(YourUniqueKey,marker);
         }
     }
 
     private void loadExistingMarkers() {
         //Fill Arraylist here from database for title, descrip, time, location;
-        for (int i = 0; i<markerTitle.size(); i++){
-            Marker marker = mMap.addMarker(new MarkerOptions()
-                    .position(newMarkerLocation.get(i))
-                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                    // Specifies the anchor to be at a particular point in the marker image.
-                    .anchor(0.5f, 1)
-                    .title(newMarker.MarkerTitle.get(i))
-                    .snippet(newMarker.MarkerDescription.get(i) + " Time: " + newMarker.MarkerTime)
-                    .draggable(false));
+       if(creationStarted==true){
+           Marker marker = mMap.addMarker(new MarkerOptions()
+                   .position(lastCamSite.target)
+                   .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
+                   // Specifies the anchor to be at a particular point in the marker image.
+                   .anchor(0.5f, 1)
+                   .title(PlacingMarker.markerTitleRecent)
+                   .snippet(PlacingMarker.markerDescriptionRecent)
+                   .draggable(false));
+           AllMarkers.add(marker);
+           marker.remove();
+       }
 
-            Log.d(TAG, "MarkerCreation For LOOP");
-            AllMarkers.add(marker);
-            AllMarkersOptions.add(new MarkerOptions()
+        for (int i = 0; i<AllMarkers.size(); i++){
+            mMap.addMarker(new MarkerOptions()
                     .position(newMarkerLocation.get(i))
                     .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
                     // Specifies the anchor to be at a particular point in the marker image.
                     .anchor(0.5f, 1)
-                    .title(newMarker.MarkerTitle.get(i))
-                    .snippet(newMarker.MarkerDescription.get(i) + " Time: " + newMarker.MarkerTime)
+                    .title(PlacingMarker.markerTitleRecent)
+                    .snippet(PlacingMarker.markerDescriptionRecent)
                     .draggable(false));
+            Log.d(TAG, "MarkerCreation For LOOP");
         }
     }
 
@@ -184,8 +197,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
                     // Specifies the anchor to be at a particular point in the marker image.
                     .anchor(0.5f, 1)
-                    .title(newMarker.MarkerTitle.get(i))
-                    .snippet(newMarker.MarkerDescription.get(i) + " Time: " + newMarker.MarkerTime)
+                    .title(PlacingMarker.MarkerTitle.get(i))
+                    .snippet(PlacingMarker.MarkerDescription.get(i))
                     .draggable(true));
             Log.d(TAG, "MarkerCreation For LOOP");
 
@@ -268,11 +281,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onMarkerClick(Marker marker) {
         marker.showInfoWindow();
+        tobeDeleted = marker;
         for(int i =0; i<AllMarkers.size(); i++) {
             if (marker.equals(AllMarkers.get(i))){
                 removalIndex = i;
                 isMarkerSelected = true;
             }
+
         }
         return true;
     }//ACTIVE

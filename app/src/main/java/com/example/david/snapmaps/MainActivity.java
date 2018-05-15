@@ -1,6 +1,7 @@
 package com.example.david.snapmaps;
 
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -10,10 +11,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -33,7 +38,7 @@ import Database.UserDB;
 import static Database.Keys.email;
 import static Database.Keys.password;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     private static final String Tag = "MainActivity";
     private static final int ERROR_DIALOGUE_REQUEST = 9001;
     public static final String TAG = "SNAPMAPS";
@@ -42,27 +47,35 @@ public class MainActivity extends AppCompatActivity {
     UserDB userDB;
     JSONObject jsonObject = new JSONObject();
     TextView mTextView;
+    String dataFromBase;
+    Matcher m1;
+    Matcher m2;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//Remove title bar
+//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//Remove notification bar
+//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//set content view AFTER ABOVE sequence (to avoid crash)
+        this.setContentView(R.layout.activity_main);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mTextView = (TextView) findViewById(R.id.textView5);
-
+        //mTextView = (TextView) findViewById(R.id.textView5);
+        //tx1.setVisibility(View.GONE);
         if (isServicesOK()) {
             init();
-            doAVolley("hello");
+            //doAVolley("hello");
         }
     }
 
 // ...
 
-    public void doAVolley(String password) {
+/*    public void doAVolley(String password) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "http://api.a17-sd501.studev.groept.be/get_first_name/1";
-
+        tx1.setVisibility(View.GONE);
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -70,17 +83,20 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
                        mTextView.setText("Response is: " + response);
+                       dataFromBase = response;
+                       m1.p.matcher();
+                               m1.group(1);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 mTextView.setText("That didn't work!");
             }
-        });
+      });
 
 // Add the request to the RequestQueue.
         queue.add(stringRequest);
-    }
+    }*/
   public boolean isServicesOK() {
 
         Log.d(Tag, "isServicesOK: checking google services version");
@@ -106,10 +122,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //ed1 = (EditText)findViewById(R.id.editText);
-                //ed2 = (EditText)findViewById(R.id.editText2);
+                ed1 = (EditText)findViewById(R.id.editText);
+                ed2 = (EditText)findViewById(R.id.editText2);
                 tx1 = (TextView) findViewById(R.id.wrongPass);
-                tx1.setVisibility(View.GONE);
+
                 //String name = "";
                 try {
 
@@ -131,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 //}else{
                 //    Toast.makeText(getApplicationContext(), userDB.firstName,Toast.LENGTH_SHORT).show();
-                Log.d(TAG, userDB.getFirstName());
+                //Log.d(TAG, userDB.getFirstName());
                 //        tx1.setVisibility(View.VISIBLE);
                 //        tx1.setBackgroundColor(Color.RED);
                 //}
