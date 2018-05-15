@@ -42,8 +42,7 @@ import java.util.HashMap;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMarkerClickListener {
 
     private GoogleApiClient mGoogleApiClient;
-    private Marker mMarker;
-    private int removalIndex;
+
     private GoogleMap mMap;
     private boolean isMarkerSelected;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -284,7 +283,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         tobeDeleted = marker;
         for(int i =0; i<AllMarkers.size(); i++) {
             if (marker.equals(AllMarkers.get(i))){
-                removalIndex = i;
                 isMarkerSelected = true;
             }
 
