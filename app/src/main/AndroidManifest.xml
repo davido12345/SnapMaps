@@ -59,6 +59,18 @@
         <activity
             android:name=".PlacingMarker"
             android:label="@string/title_activity_placing_marker"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SelectionPage"
+            android:label="@string/title_activity_selection_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ProfilePage"
+            android:label="@string/title_activity_profile_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".FriendSearch"
+            android:label="@string/title_activity_friend_search"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
