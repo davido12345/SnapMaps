@@ -17,4 +17,6 @@
     <string name="title_activity_selection_page">SelectionPage</string>
     <string name="title_activity_profile_page">ProfilePage</string>
     <string name="title_activity_friend_search">FriendSearch</string>
+    <string name="title_activity_locations">Locations</string>
+    <string name="title_activity_events">Events</string>
 </resources>

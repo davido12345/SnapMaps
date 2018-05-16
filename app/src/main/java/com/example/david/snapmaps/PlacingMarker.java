@@ -53,16 +53,16 @@ public class PlacingMarker extends Activity {
         EditText txtTitle =
                 (EditText) findViewById(R.id.editTitle);
         String markerTitle = txtTitle.getText().toString();
-        MarkerTitle.add(markerTitle);
-        markerTitleRecent = markerTitle;
+        MapsActivity.userAddedTitles.add(markerTitle);
+
 
         EditText txtDescription =
                 (EditText) findViewById(R.id.editDescript);
         String markerDescription = txtDescription.getText().toString();
-        MarkerDescription.add(markerDescription);
+        MapsActivity.userAddedDescriptions.add(markerDescription);
         Log.d(TAG, "initMap: MarkerData Created");
-        markerDescriptionRecent=markerDescription;
 
+        MapsActivity.userAddedLatLng.add(MapsActivity.lastCamSite);
 
 
         Log.d(TAG, "initMap: MarkerData Created");

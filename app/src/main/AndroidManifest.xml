@@ -71,6 +71,14 @@
         <activity
             android:name=".FriendSearch"
             android:label="@string/title_activity_friend_search"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Locations"
+            android:label="@string/title_activity_locations"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Events"
+            android:label="@string/title_activity_events"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

@@ -51,13 +51,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private Boolean mLocationPermissionsGranted = false;
     private PlaceInfo mPlace;
-    public ArrayList<Marker> AllMarkers = new ArrayList<>();
+    public static ArrayList<Marker> AllMarkers = new ArrayList<>();
     ArrayList<MarkerOptions> AllMarkersOptions = new ArrayList<>();
-    public ArrayList<Marker> userAddedMarkers = new ArrayList<>();
-    public ArrayList<String> markerTitle = new ArrayList<>();
-    public ArrayList<String> markerDescription = new ArrayList<>();
-    public ArrayList<LatLng> markerCoords = new ArrayList<>();
-    public ArrayList<LatLng> Time = new ArrayList<>();
+    public static ArrayList<Marker> userAddedMarkers = new ArrayList<>();
+    public static ArrayList<LatLng> userAddedLatLng = new ArrayList<>();
+    public static ArrayList<String> userAddedTitles = new ArrayList<>();
+    public static ArrayList<String> userAddedDescriptions = new ArrayList<>();
     public static int addedThisSession;
     public static final String TAG = "MAPPING";
     LatLng location2 = new LatLng(-34, 151);
@@ -66,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng sydney2 = new LatLng(-34, 150);
     public static ArrayList<LatLng> newMarkerLocation = new ArrayList<>();
     private Marker tobeDeleted;
-    private static CameraPosition lastCamSite;
+    public static LatLng lastCamSite;
     public static boolean creationStarted=false;
 
 
@@ -92,17 +91,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        Button Map = (Button) findViewById(R.id.markerMaker);
+        Button Map = (Button) findViewById(R.id.markerMaker);//LOCATION
         Map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 trackCamera();
                 addedThisSession++;
                 Log.d(TAG, "ButtonPressed");
-                Intent intent = new Intent(MapsActivity.this, PlacingMarker.class);
+                Intent intent = new Intent(MapsActivity.this, Locations.class);
                 startActivity(intent);
-
-
             }
         });
 
@@ -111,13 +108,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 //trackCamera();
+
                 Log.d(TAG, "ButtonPressed");
-                tobeDeleted.remove();
+                Intent intent = new Intent(MapsActivity.this, Events.class);
+                startActivity(intent);
+                /*tobeDeleted.remove();
                 for(int i = 0; i<AllMarkers.size(); i++){
                     if(AllMarkers.get(i) == tobeDeleted){
                         AllMarkers.remove(i);
                     }
-                }
+                }*/
             }
 
         });
@@ -126,82 +126,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void trackCamera() {
         Log.d(TAG, "Getting Cam Coords");
         newMarkerLocation.add(mMap.getCameraPosition().target);
-        lastCamSite= mMap.getCameraPosition();
+        lastCamSite= mMap.getCameraPosition().target;
     }//Inactive
 
 
-    private void createMarkers(){
-        for (int i = 0; i<AllMarkers.size(); i++){
-            //HashMap<Marker> hashMapMarker = new HashMap<>();
-            mMap.addMarker(AllMarkersOptions.get(i));
-
-
-            //hashMapMarker.put(YourUniqueKey,marker);
-        }
-    }
-
-    private void loadCreatedMarkers() {
-        //Fill Arraylist here from database for title, descrip, time, location;
-       if(creationStarted==true){
-           Marker marker = mMap.addMarker(new MarkerOptions()
-                   .position(lastCamSite.target)
-                   .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                   // Specifies the anchor to be at a particular point in the marker image.
-                   .anchor(0.5f, 1)
-                   .title(PlacingMarker.markerTitleRecent)
-                   .snippet(PlacingMarker.markerDescriptionRecent)
-                   .draggable(false));
-           AllMarkers.add(marker);
-           marker.remove();
-       }
-
-        for (int i = 0; i<AllMarkers.size(); i++){
-            mMap.addMarker(new MarkerOptions()
-                    .position(newMarkerLocation.get(i))
-                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                    // Specifies the anchor to be at a particular point in the marker image.
-                    .anchor(0.5f, 1)
-                    .title(PlacingMarker.markerTitleRecent)
-                    .snippet(PlacingMarker.markerDescriptionRecent)
-                    .draggable(false));
-            Log.d(TAG, "MarkerCreation For LOOP");
-        }
-    }
-
     private void loadUserMarker(){
+
+        AllMarkers.clear();
+
         for(int i = 0; i < UserInfo.locationNames.size(); i++) {
-            mMap.addMarker(
+            Marker marker = mMap.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(UserInfo.latitudes.get(i), UserInfo.longitudes.get(i)))
                             .title(UserInfo.locationNames.get(i))
                             .snippet(UserInfo.comments.get(i)));
-
+            AllMarkers.add(marker);
         }
     }
     private void loadFriendsMarkers(){
 
     }
+    private void loadNewCreatedMarkers(){
+        for(int i = 0; i < userAddedTitles.size(); i++) {
+            Marker marker = mMap.addMarker(
+                    new MarkerOptions()
+                            .position(userAddedLatLng.get(i))
+                            .title(userAddedTitles.get(i))
+                            .snippet(userAddedDescriptions.get(i)));
 
-
-
-
-    /*
-    private void markerMonitor(){
-        for(int i = 0; i<markerTitle.length; i++){
-        public boolean onMarkerClick(Marker marker)
-            {
-            return false;
-            }
+            AllMarkers.add(marker);
         }
+
     }
-*/
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Log.d(TAG, "Markers to be added: " + userAddedMarkers);
         loadUserMarker();
-        loadCreatedMarkers();
-        createMarkers();
+        loadNewCreatedMarkers();
+        //createMarkers();
         Log.d(TAG, "initMap: PLACING MARKERS");
         mMap.setOnMarkerClickListener(this);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
@@ -272,36 +236,3 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 }
 
 
-
-
-
-
-
-
-/*
-    private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo) {
-        Log.d(TAG, "moveCamera: moving camera to: latitutde:" + latLng.latitude + ", longitude: " + latLng.longitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-        mMap.clear();
-
-        if (placeInfo != null) {
-            try {
-                String snippet = "Address: " + placeInfo.getAddress() + "\n" +
-                        "Phone: " + placeInfo.getPhoneNumber() + "\n" +
-                        "Website: " + placeInfo.getWebsiteUri() + "\n" +
-                        "Price Rating: " + placeInfo.getRating() + "\n";
-                MarkerOptions options = new MarkerOptions()
-                        .position(latLng)
-                        .title(placeInfo.getName())
-                        .snippet(snippet);
-                mMarker = mMap.addMarker(options);
-            } catch (NullPointerException e) {
-                Log.e(TAG, "moveCamera: NullPointerException " + e.getMessage());
-            }
-        } else {
-            mMap.addMarker(new MarkerOptions().position(latLng));
-        }
-
-        //hideSoftKeyboard();
-    }
-    */

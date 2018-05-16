@@ -55,14 +55,14 @@ tools:context=".MapsActivity" >
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Create Marker" />
+            android:text="Locations" />
 
         <Button
             android:id="@+id/delButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Delete Marker" />
+            android:text="Events" />
     </LinearLayout>
 
 </FrameLayout>
