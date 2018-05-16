@@ -107,12 +107,6 @@
             android:layout_weight="1"
             android:text="To the Map!" />
 
-        <Button
-            android:id="@+id/profileFriendsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Find friends" />
     </LinearLayout>
 
     <EditText

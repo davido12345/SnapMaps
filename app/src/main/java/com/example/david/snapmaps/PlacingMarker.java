@@ -63,10 +63,7 @@ public class PlacingMarker extends Activity {
         Log.d(TAG, "initMap: MarkerData Created");
         markerDescriptionRecent=markerDescription;
 
-        EditText txtTime =
-                (EditText) findViewById(R.id.editTime);
-        String markerTime = txtTime.getText().toString();
-        MarkerDescription.add(markerDescription);
+
 
         Log.d(TAG, "initMap: MarkerData Created");
 

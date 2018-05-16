@@ -19,6 +19,7 @@ import android.widget.Toast;
 //import com.google.android.gms.location.places.PlaceDetectionClient;
 
 
+import com.example.david.snapmaps.Databases.UserInfo;
 import com.google.android.gms.common.api.GoogleApiClient;
 //import com.google.android.gms.location.places.AutocompletePrediction;
 //import com.google.android.gms.location.places.Place;
@@ -139,7 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void loadExistingMarkers() {
+    private void loadCreatedMarkers() {
         //Fill Arraylist here from database for title, descrip, time, location;
        if(creationStarted==true){
            Marker marker = mMap.addMarker(new MarkerOptions()
@@ -167,45 +168,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void loadOtherMarker(){
-        AllMarkersOptions.add(new MarkerOptions()
-                .position(sydney)
-                .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                // Specifies the anchor to be at a particular point in the marker image.
-                .anchor(0.5f, 1)
-                .title("My Sponge is Ready")
-                .snippet("Meme"));
-        AllMarkersOptions.add(new MarkerOptions()
-                .position(location2)
-                .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                // Specifies the anchor to be at a particular point in the marker image.
-                .anchor(0.5f, 1)
-                .title("My Sponge is Ready")
-                .snippet("Google Hire Me Already"));
-        mMap.addMarker(new MarkerOptions()
-                .position(sydney)
-                .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                // Specifies the anchor to be at a particular point in the marker image.
-                .anchor(0.5f, 1)
-                .title("My Sponge is Ready")
-                .snippet("Meme"));
-        for (int i = 0; i < addedThisSession; i++) {
-
-            mMap.addMarker(new MarkerOptions()
-                    .position(newMarkerLocation.get(i))
-                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.s_round))
-                    // Specifies the anchor to be at a particular point in the marker image.
-                    .anchor(0.5f, 1)
-                    .title(PlacingMarker.MarkerTitle.get(i))
-                    .snippet(PlacingMarker.MarkerDescription.get(i))
-                    .draggable(true));
-            Log.d(TAG, "MarkerCreation For LOOP");
+    private void loadUserMarker(){
+        for(int i = 0; i < UserInfo.locationNames.size(); i++) {
+            mMap.addMarker(
+                    new MarkerOptions()
+                            .position(new LatLng(UserInfo.latitudes.get(i), UserInfo.longitudes.get(i)))
+                            .title(UserInfo.locationNames.get(i))
+                            .snippet(UserInfo.comments.get(i)));
 
         }
-
-
+    }
+    private void loadFriendsMarkers(){
 
     }
+
+
+
+
     /*
     private void markerMonitor(){
         for(int i = 0; i<markerTitle.length; i++){
@@ -220,8 +199,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         Log.d(TAG, "Markers to be added: " + userAddedMarkers);
-        loadOtherMarker();
-        loadExistingMarkers();
+        loadUserMarker();
+        loadCreatedMarkers();
         createMarkers();
         Log.d(TAG, "initMap: PLACING MARKERS");
         mMap.setOnMarkerClickListener(this);
@@ -291,6 +270,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }//ACTIVE
 
 }
+
+
+
+
+
+
+
 
 /*
     private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo) {

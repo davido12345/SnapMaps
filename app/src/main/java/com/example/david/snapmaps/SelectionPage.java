@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 
 public class SelectionPage extends AppCompatActivity {
 
@@ -24,6 +25,16 @@ public class SelectionPage extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-    }
 
+    }
+    /*
+    private void init() {
+        Button Map = (Button) findViewById(R.id.Map);
+        Map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        }
+    }
+    */
 }
